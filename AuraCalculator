@@ -1,0 +1,92 @@
+//Component code....
+<aura:component>
+    <div><h1>CALCULATOR</h1></div><br/>
+    <aura:attribute name = "mynum1" type = "Integer"/>
+     <aura:attribute name = "mynum2" type = "Integer"/>   
+    <aura:attribute name = "result" type = "Integer"/>
+   
+    <lightning:input label = "Number1:" value = "{!v.mynum1}"/>
+    <br/>
+    
+    <lightning:input label = "Number2:" value = "{!v.mynum2}"/>
+    <br/>
+    
+    <div>Result = {!v.result}</div>
+                     
+     <div>
+         <lightning:button label = "Addition" onclick = "{!c.addition}"/>
+         <lightning:button label = "Refresh" onclick = "{!c.refresh}"/>
+         <lightning:button label = "Substraction" onclick = "{!c.substraction}"/>
+         <lightning:button label = "Multiplication" onclick = "{!c.multiplication}"/>
+         <lightning:button label = "Division" onclick = "{!c.division}"/>
+    </div>
+     
+    
+</aura:component>
+=======================================================================
+//controller code...
+({
+        addition : function(component, event, helper )
+        { 
+            console.log("the answer is..")
+            var num1 = component.get("v.mynum1");
+            var num2 = component.get("v.mynum2");
+            var result = parseInt(num1)+ parseInt(num2);
+            component.set("v.result", result);
+            
+        },
+    
+        substraction : function (component, event, helper )
+        { 
+            var num1 = component.get("v.mynum1");
+            var num2 = component.get("v.mynum2");
+            var result = parseInt(num1)- parseInt(num2);
+            if(num1<num2)
+            {
+                alert("Number1 should be grater.")
+            }
+            else
+            {
+                 component.set("v.result", result); 
+            }  
+            
+        },
+     multiplication : function (component, event,helper )
+        { 
+            var num1 = component.get("v.mynum1");
+            var num2 = component.get("v.mynum2");
+            var result = parseInt(num1)* parseInt(num2);
+            component.set("v.result", result);
+            
+        },
+     division : function (component, event,helper )
+        { 
+            var num1 = component.get("v.myum1");
+            var num2 = component.get("v.mynum2");
+            var result = parseInt(num1)/parseInt(num2);
+           if(num2==0)
+            {
+                alert("Number2 should not be zero.")
+            }
+            else
+            {
+                 component.set("v.result", result); 
+            }  
+            
+        },
+    refresh : function (component, event,helper )
+        {  
+            var num1 = component.get("v.mynum1");
+            var num2 = component.get("v.mynum2");
+            component.set("v.myNum1", null);
+            component.set("v.myNum2", null);
+            component.set("v.result", null);
+            
+        },
+    
+    
+
+        
+       
+	
+})
