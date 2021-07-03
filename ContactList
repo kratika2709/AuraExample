@@ -1,0 +1,57 @@
+# Apex Class Code
+public class Contactlistcontroller{
+    @AuraEnabled
+    public static list<contact> contactlist(){
+        list<contact> conlst = new list<contact>([select id,firstname,lastname,email from contact]);
+        return conlst;
+       }
+   
+}
+---------------------------------------------------
+#Component code
+<aura:component controller="Contactlistcontroller">
+    <aura:attribute name="ContList"  type="contact[]" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.docreateConlist}" />
+    <aura:iteration items="{!v.ContList}" var="con">
+        {!con.FirstName} 
+        {!con.LastName}
+        
+     </aura:iteration>
+    
+	
+</aura:component>
+------------------------------------------------------------
+#controller code
+({
+	docreateConlist : function(component, event, helper) {
+        /*Step1*/
+        var action= component.get('c.contactlist');
+    
+        /*Step2/* optional*/
+        action.setParams({
+            
+        });
+        
+        /*Step4*/
+        action.setCallback(this, function(response){
+            //var state = response.getState();
+            var responsevalue= response.getReturnValue();
+           
+            console.log('responsevalue',responsevalue);
+            
+            component.set('v.ContList',responsevalue);
+            });
+       
+        /*Step3*/
+        $A.enqueueAction(action, false);
+          
+		
+	}
+})
+-----------------------------------------------------------
+# App Code
+<aura:application >
+    <c:ContactList />
+</aura:application>
+--------------------------------------------------------
