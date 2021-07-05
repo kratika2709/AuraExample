@@ -1,0 +1,77 @@
+Steps: a)Lightning Component.
+       b) Apex class to be used as a lightning component controller.
+       c) create an apex class to query 10 contacts.
+       d)Call the apex class method from javascript.
+       e) Displet the list in lightning component.
+       
+ # Apex Class
+ public class Contactlistcontroller{
+    @AuraEnabled
+    public static list<contact> contactlist( string accid){
+        list<contact> conlst = new list<contact>([select id,firstname,lastname,email,phone from contact where Accountid=: accid]);
+        return conlst;
+       }
+   
+}
+---------------------------------------------------------
+# Component File
+<aura:component controller="Contactlistcontroller" implements="force:hasRecordId,force:hassobjectName,flexiPage:availableForAllPageTypes" access="global">
+    <aura:attribute name="ContList"  type="contact[]" />
+    {!v.sobjectname}
+   <aura:handler name="init" value="{!this}" action="{!c.docreateConlist}" />
+   <div class="slds-var-p-around_x-small ">
+    <aura:iteration items="{!v.ContList}" var="con">
+      <div class="slds-col slds-size_1-of-3 slds-var-p-around_x-small" >
+       <lightning:card title="{!con.LastName}" footer="{!con.email}" iconName="action:add_contact" >
+           <aura:set attribute="actions">
+               <lightning:button name="{!con.Id}" label="Details" variant="brand" onclick="{!c.doRedirect}"/><br/>
+           </aura:set>
+              {!con.FirstName}{!con.LastName}
+              {!con.phone}
+        </lightning:card>
+       </div>
+     </aura:iteration>
+    </div>
+    
+	
+</aura:component>
+-----------------------------------------------------------
+# Controller File
+({
+	docreateConlist : function(component, event, helper) {
+        /*Step1*/
+        var action= component.get('c.contactlist');
+    
+        /*Step2/* optional*/
+        action.setParams({
+            accid : component.get('v.recordId') 
+        });
+        
+        /*Step4*/
+        action.setCallback(this, function(response){
+            //var state = response.getState();
+            var responsevalue= response.getReturnValue();
+           
+            console.log('responsevalue',responsevalue);
+            
+            component.set('v.ContList',responsevalue);
+            });
+       
+        /*Step3*/
+        $A.enqueueAction(action, false);
+          
+		
+	},
+    doRedirect : function(component, event, helper) {
+           var callevent= event.getSource();
+           var id = callevent.get('v.name');
+            //alert(id);
+            var navEvt = $A.get("e.force:navigateToSObject");
+        navEvt.setParams({
+              "recordId":id,
+              "slideDevName": "detail"
+            });
+            navEvt.fire();
+    
+},
+})
