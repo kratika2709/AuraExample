@@ -1,0 +1,41 @@
+#Class Code
+public class ManageAccount {
+   @AuraEnabled
+    public static list<account> getaccount( )
+   {
+       
+       list<account> acclst = new list<account>();
+       acclst = [select id,name from account where type ='Technology Partner'];
+           
+       return acclst;
+   }
+}
+===================================================
+# Controller Code
+public class ManageAccount {
+   @AuraEnabled
+    public static list<account> getaccount( )
+   {
+       
+       list<account> acclst = new list<account>();
+       acclst = [select id,name from account where type ='Technology Partner'];
+           
+       return acclst;
+   }
+}
+===================================================
+#Component Code
+<aura:component controller="ManageAccount" implements="force:appHostable" >
+    <aura:attribute name="AccountSelectValue" type ="string" default="" />
+     <aura:attribute name="SelectOptions" type="list" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <lightning:combobox aura:id="select" name="selectcombo" label="Technology Partner Accounts" 
+                     required="true" value="{!v.AccountSelectValue}" options="{! v.SelectOptions }" />
+    
+    <lightning:button variant="brand" label="Submit" title="Base action" onclick="{! c.handleClick }"/>
+                    <aura:iteration items="{!v.SelectOptions}" var="opp">
+                        {!opp.id}<br/>
+                        {!opp.type}
+    				</aura:iteration>
+</aura:component>
