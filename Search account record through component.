@@ -1,0 +1,71 @@
+# Apex class
+public class FetchAccountDetails {
+    @auraEnabled
+    public static list<account> FetchAccountDetailsMethod (string accid)
+    {
+        list<account> acclst= [select id, name, rating , type, phone from account];
+        return acclst;
+    }
+     @auraEnabled
+    public static List<Account> findByName(String searchKey) {
+        String name =  searchKey + '%';
+        return [SELECT id, name, phone,type,rating FROM Account WHERE name LIKE :name];
+}
+}
+===================================================
+# Component
+<aura:component controller="FetchAccountDetails">
+    <aura:attribute name="accounts" type="string[]"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+    <lightning:input type="text" name="searchKey" label="Search" aura:id="searchKey" onchange="{!c.searchKeyChange}" placeholder="Search" />    
+
+      <aura:iteration items ="{!v.accounts}" var="acc">
+        <lightning:card title="Accounts" iconName="standard:account" footer="This page shows account details.">
+               <div class= "slds-var-p-around_x-small">
+                      <div class="slds-col slds-order_3">
+                   Account Name: {!acc.Name}<br/> 
+                   Account Type: {!acc.Type}<br/> 
+                   Account Rating:{!acc.Rating}<br/>
+                   Account Rating: {!acc.rating}<br/>
+                   Account Phone : {!acc.Phone}
+                      </div>
+                  </div>
+          
+        
+     </lightning:card>
+    </aura:iteration>
+</aura:component>
+========================================================
+# Controller
+({
+	doInit : function(component, event, helper) {
+		var action = component.get('c.FetchAccountDetailsMethod');
+        
+        action.setCallback(this,function(response){
+           var state =response.getState();            
+            if(state === 'SUCCESS')
+               {
+                   var result = response.getReturnValue();
+                   console.log(result);
+                   var abc =component.set('v.accounts', result);
+                   console.log(abc);
+               }else{
+                   
+                   console.log("Failed to fetch records.")
+               }
+                           });
+        $A.enqueueAction(action);
+	},
+    searchKeyChange: function(component, event) {
+        var searchKey = component.find("searchKey").get("v.value");
+        var action = component.get('c.findByName');
+        action.setParams({
+            "searchKey": searchKey
+        });
+        action.setCallback(this, function(a) {
+            component.set("v.accounts", a.getReturnValue());
+        });
+        $A.enqueueAction(action);
+    },
+    
+})
