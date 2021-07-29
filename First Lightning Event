@@ -1,0 +1,41 @@
+# Event
+<aura:event type="COMPONENT">
+<aura:attribute name="message" type="String" />
+</aura:event>
+================
+# Child Component
+#cmp
+<aura:component >
+	<aura:registerEvent name="cmpEvent" type="c:FirstEvent"/>
+   <lightning:card>
+    <lightning:button label ="Click Here" variant="brand" onclick="{!c.doClick}"/>
+    </lightning:card>
+</aura:component>
+
+#js
+({
+	doClick : function(component, event, helper) {
+		var comEvent = component.getEvent("cmpEvent");
+        comEvent.setParams({
+            "message" : "Welcome to infoFeat." });
+        comEvent.fire();
+	}
+})
+=====================
+# Parent Component
+#cmp
+<aura:component >
+    <aura:attribute type="string" name="EventMessage" />
+    <aura:handler name="cmpEvent" event="c:FirstEvent" action="{!c.Callme}"/>
+    <c:FirstEventChild/>
+    
+    {!v.EventMessage}
+</aura:component>
+
+#js
+({
+	Callme : function(component, event, helper) {
+		var message = event.getParam("message");
+        component.set('v.EventMessage',message);
+	}
+})
