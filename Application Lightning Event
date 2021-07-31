@@ -1,0 +1,41 @@
+#Event file
+<aura:event type="APPLICATION" description="Event template" >
+    <aura:attribute name="message" type="string"/>
+</aura:event>
+=============================
+# first component
+#cmp
+<aura:component >
+    
+    <aura:registerEvent name="SecondEvent" type="c:ApplicationEvent"/>
+    <lightning:button  label="Show" onclick="{!c.ClickHere}"/>
+</aura:component>
+
+#js
+({
+	ClickHere : function(component, event, helper) {
+		
+        var evt = $A.get("e.c:ApplicationEvent");
+        evt.setParams({"message" : "Welcome To infoFeat"});
+        
+        evt.fire();
+        
+	}
+})
+=============================
+# second Component
+#cmp
+<aura:component >
+    <aura:attribute name="ShowMsg" type="string"/>
+  	<aura:handler  event="c:ApplicationEvent" action="{!c.Callme}"/>
+   NAME :  {!v.ShowMsg}
+</aura:component>
+
+#js
+({
+	Callme : function(component, event, helper) {
+        
+		var show = event.getParam("message");
+        component.set("v.ShowMsg",show);
+	}
+})
