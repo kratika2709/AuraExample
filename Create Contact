@@ -1,0 +1,49 @@
+#Component
+<aura:component controller="CreateAuraContact">
+    <aura:attribute name="con" type="contact" default="{'sObjectType':'contact'}" />
+    <lightning:card title="Contacts">
+        <aura:set attribute="actions">
+        <lightning:button label="save" onclick="{!c.doSave}" />
+        </aura:set>
+        <lightning:input label="FirstName" value="{!v.con.FirstName}"/>
+        <lightning:input label="LastName" value="{!v.con.LastName}"/>
+        <lightning:input label="Phone" value="{!v.con.Phone}"/>
+        <lightning:input label="Email" value="{!v.con.Email}"/>
+    
+    
+    
+    </lightning:card>
+</aura:component>
+=======================================
+#js
+({
+	doSave : function(component, event, helper) {
+        var abc = component.get("v.con");
+        var action = component.get("c.InsertContact");
+        
+        action.setParams({
+            'xyz':abc
+        });
+        action.setCallback(this,function(response){
+            var state = response.getState();
+            if(state === 'Success')
+            {
+                var result = response.getReturnValue();
+            }
+        });
+        
+        $A.enqueueAction(action); 
+		
+	}
+})
+=============================
+# apex class
+public class CreateAuraContact {
+    @auraEnabled
+    public static void InsertContact(contact xyz)
+    {
+        insert xyz;
+        
+        
+    }
+}
