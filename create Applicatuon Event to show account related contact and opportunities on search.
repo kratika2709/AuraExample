@@ -1,0 +1,128 @@
+# Event code
+<aura:event type="APPLICATION" description="Event template" >
+    <aura:attribute name="accId" type="ID"/>
+</aura:event>
+============================
+# Apex code
+public class AppEventUseCase {
+    @AuraEnabled
+   public static id accList(string accName)
+   {
+       account acc = new account ();
+       acc = [select id,name from account where name like: accName];
+       return acc.id;
+   }
+   @AuraEnabled
+    public static List<contact> conList(id accId)
+    {
+        List<contact> con = new List<contact>();
+        con = [select id,firstname,lastname ,accountid from contact where Accountid=:accId];
+        return con;
+    }
+   @AuraEnabled
+    public static List<opportunity> oppList(id accId)
+    {
+        List<opportunity> opp = new List<opportunity>();
+        opp = [select id, name from opportunity where Accountid=:accid];
+        return opp;
+    }
+}
+================================
+# Child Cmp
+# Cmp
+<aura:component controller="AppEventUseCase" >
+    <aura:attribute name="acc" type="String" />
+    <lightning:input name="acc_name" label="Enter Account Name" value="{!v.acc}"/>
+    <lightning:button label="Search Account" value= "{!v.acc}" onclick="{!c.click}" />
+   
+   
+   
+</aura:component>
+# js
+({
+    click : function(component, event, helper) {
+        
+        var action= component.get('c.accList');
+        var abc = component.get("v.acc");
+        action.setParams({"accName":abc});
+        action.setCallback(this,function(response){
+            var state=response.getState();
+            if(state == 'SUCCESS')
+            {
+                var result = response.getReturnValue();
+                 var appEvent = $A.get("e.c:AppEventUseCase");
+                appEvent.setParams({"accId":result});
+                appEvent.fire();
+                
+            }
+        });
+        $A.enqueueAction(action);
+    }
+})
+======================================
+# Parent1
+#Cmp
+
+<aura:component controller="AppEventUseCase">
+    <aura:handler event="c:AppUseCase" action="{!c.searchRelatedContacts}"/>
+    <aura:attribute name="contactList" type="Contact"/>
+    <aura:iteration items="{!v.contactList}" var="con">
+       FirtName: {!con.FirstName}<br/>
+       LastName: {!con.LastName}
+    </aura:iteration>
+</aura:component>
+# js
+({
+	searchRelatedContacts : function(component, event, helper) {
+		var action = component.get("c.conList");
+        var xyz =event.getParam("accId");
+        action.setParams({"accId":xyz});
+     
+        action.setCallback(this,function(response){
+            if(response.getState() == 'SUCCESS')
+            {
+                console.log("SUCCESS");
+                 console.log(response.getReturnValue());
+                var res = response.getReturnValue();
+            component.set("v.contactList",res);
+            }
+        });
+        $A.enqueueAction(action);
+	}
+  
+})
+===================================
+#Parent2
+# Cmp
+<aura:component controller="AppEventUseCase">
+    <aura:handler event="c:AppUseCase" action="{!c.searchRelatedOpportunities}"/>
+    <aura:attribute name="oppList" type="Opportunity"/>
+    <aura:iteration items="{!v.oppList}" var="opp">
+       Opportunity Name:{!opp.Name}
+        
+    </aura:iteration>
+</aura:component>
+#js
+({
+	searchRelatedOpportunities : function(component, event, helper) {
+        alert("oppp");
+		var action = component.get("c.oppList");
+        var klm =event.getParam("accId");
+        action.setParams({"accId":klm});
+        
+        action.setCallback(this,function(response){
+            if(response.getState() == 'SUCCESS')
+            {
+             var res1 = response.getReturnValue();
+                console.log(res1);
+               
+             component.set("v.oppList",res1);
+            }
+        });
+        $A.enqueueAction(action);
+	}
+  
+})
+
+
+
